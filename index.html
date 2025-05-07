@@ -4,98 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tzappa's GitHub Pages</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .card {
-            background-color: #f5f8fa;
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .card h2 {
-            color: #3498db;
-            margin-bottom: 1rem;
-        }
-
-        .card p {
-            margin-bottom: 1.5rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        footer {
-            margin-top: 2rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-    </style>
+    <link rel="stylesheet" href="running-time-table.css">
 </head>
 <body>
-    <header>
-        <h1>Tzappa's GitHub Pages</h1>
-        <p>Collection of tools and resources</p>
-    </header>
+    <main class="calculator-container">
+        <div class="content-wrapper">
+            <header>
+                <h1 class="main-title">Tzappa's GitHub Pages</h1>
+                <p class="section-title" style="text-align: center; margin-top: -1rem;">Collection of tools and resources</p>
+            </header>
 
-    <div class="container">
-        <div class="card">
-            <h2>Running Time Table</h2>
-            <p>View estimated finish times for various distances based on different running paces. Also includes a pace calculator to help plan your races.</p>
-            <a href="running-time-table.html" class="btn">View Time Table</a>
+            <div class="calculator-layout">
+                <section class="calculator-form-section">
+                    <article class="card">
+                        <h2 class="section-title">Running Time Table</h2>
+                        <div class="form-container">
+                            <p>View estimated finish times for various distances based on different running paces. Also includes a pace calculator to help plan your races.</p>
+                            <a href="running-time-table.html" class="calculate-button" style="display: inline-block; text-decoration: none; text-align: center;">View Time Table</a>
+                        </div>
+                    </article>
+                </section>
+            </div>
+
+            <footer style="margin-top: 4rem; text-align: center; font-size: 0.9rem; opacity: 0.7;">
+                <p>&copy; 2025 Tzappa</p>
+            </footer>
         </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 Tzappa</p>
-    </footer>
+    </main>
 </body>
 </html>
