@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Running Time Table</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+	<style>
+		.time-table {
+			width: 100%;
+			overflow-x: auto;
+			margin-top: 2rem;
+		}
+
+		.time-table table {
+			border-collapse: collapse;
+			width: 100%;
+			min-width: 800px;
+		}
+
+		.time-table th {
+			background-color: #3498db;
+			color: white;
+			position: sticky;
+			top: 0;
+		}
+
+		.time-table th,
+		.time-table td {
+			padding: 0.75rem;
+			text-align: center;
+			border: 1px solid #ddd;
+		}
+
+		.time-table tr:nth-child(even) {
+			background-color: #f2f4f6;
+		}
+
+		.time-table tr:hover {
+			background-color: #e3e8ec;
+		}
+
+		.special-distance {
+			background-color: #e8f4fd !important;
+			font-weight: 600;
+		}
+
+		.pace-header {
+			min-width: 100px;
+		}
+
+		.distance-col {
+			font-weight: 500;
+			position: sticky;
+			left: 0;
+			background: white;
+			z-index: 2;
+			box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+		}
+
+		.special-distance .distance-col {
+			background-color: #e8f4fd;
+		}
+
+		/* Pace Calculator Styles */
+		.calculator {
+			background-color: #f5f8fa;
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-top: 1rem;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+			max-width: 520px;
+		}
+
+		.calculator h2 {
+			color: #2c3e50;
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+
+		.calculator-form {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1rem;
+		}
+
+		.form-group {
+			margin-bottom: 1rem;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: #34495e;
+		}
+
+		.form-group select,
+		.form-group input {
+			width: 100%;
+			padding: 0.5rem;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			font-size: 1rem;
+		}
+
+		.time-inputs {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 0.5rem;
+		}
+
+		.time-inputs input {
+			text-align: center;
+		}
+
+		.custom-distance {
+			margin-top: 0.5rem;
+			display: none;
+		}
+
+		.custom-distance.show {
+			display: block;
+		}
+
+		.btn {
+			background-color: #3498db;
+			color: white;
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			font-weight: 500;
+			transition: background-color 0.2s;
+		}
+
+		.btn:hover {
+			background-color: #2980b9;
+		}
+
+		.result {
+			margin-top: 1.5rem;
+			padding: 1rem;
+			background-color: #e8f4fd;
+			border-radius: 4px;
+			text-align: center;
+			font-size: 1.2rem;
+			font-weight: 500;
+			display: none;
+		}
+
+		.result.show {
+			display: block;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<header>
+			<h1>Running Time Table</h1>
+			<p>This table shows estimated finish times for various distances based on pace.</p>
+		</header>
+
+		<!-- Pace Calculator -->
+		<div class="calculator">
+			<h2>Pace Calculator</h2>
+			<p>Calculate the pace needed to achieve your target finish time.</p>
+
+			<div class="calculator-form">
+				<div class="form-group">
+					<label for="distanceSelect">Distance:</label>
+					<select id="distanceSelect">
+						<option value="1">1 km</option>
+						<option value="1.61">1 mile (1.61 km)</option>
+						<option value="2">2 km</option>
+						<option value="3">3 km</option>
+						<option value="3.22">2 miles (3.22 km)</option>
+						<option value="5">5 km</option>
+						<option value="8.05">5 miles (8.05 km)</option>
+						<option value="10">10 km</option>
+						<option value="16.09">10 miles (16.09 km)</option>
+						<option value="21.1">Half Marathon (21.1 km)</option>
+						<option value="42.2">Marathon (42.2 km)</option>
+						<option value="50">50 km</option>
+						<option value="custom">Custom distance</option>
+					</select>
+
+					<div id="customDistanceDiv" class="custom-distance">
+						<input type="number" id="customDistance" placeholder="Distance in km" step="0.01" min="0.1">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label>Target Time:</label>
+					<div class="time-inputs">
+						<input type="number" id="hours" placeholder="HH" min="0" max="1000">
+						<input type="number" id="minutes" placeholder="MM" min="0" max="59">
+						<input type="number" id="seconds" placeholder="SS" min="0" max="59">
+					</div>
+				</div>
+			</div>
+
+			<button id="calculateBtn" class="btn">Calculate Pace</button>
+
+			<div id="result" class="result">
+				<p>To achieve your target time, your pace needs to be: <span id="paceResult"></span></p>
+			</div>
+		</div>
+
+		<div class="time-table">
+			<div class="table-container">
+				<table>
+					<thead>
+						<tr>
+							<th class="distance-col">Distance</th>
+							<th class="pace-header">4:00/km</th>
+							<th class="pace-header">4:15/km</th>
+							<th class="pace-header">4:30/km</th>
+							<th class="pace-header">4:45/km</th>
+							<th class="pace-header">5:00/km</th>
+							<th class="pace-header">5:15/km</th>
+							<th class="pace-header">5:30/km</th>
+							<th class="pace-header">5:45/km</th>
+							<th class="pace-header">6:00/km</th>
+							<th class="pace-header">6:15/km</th>
+							<th class="pace-header">6:30/km</th>
+							<th class="pace-header">6:45/km</th>
+							<th class="pace-header">7:00/km</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="distance-col">1 km</td>
+							<td>4:00</td>
+							<td>4:15</td>
+							<td>4:30</td>
+							<td>4:45</td>
+							<td>5:00</td>
+							<td>5:15</td>
+							<td>5:30</td>
+							<td>5:45</td>
+							<td>6:00</td>
+							<td>6:15</td>
+							<td>6:30</td>
+							<td>6:45</td>
+							<td>7:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">1 mile (1.61 km)</td>
+							<td>6:26</td>
+							<td>6:51</td>
+							<td>7:15</td>
+							<td>7:39</td>
+							<td>8:03</td>
+							<td>8:27</td>
+							<td>8:51</td>
+							<td>9:15</td>
+							<td>9:39</td>
+							<td>10:03</td>
+							<td>10:27</td>
+							<td>10:51</td>
+							<td>11:15</td>
+						</tr>
+						<tr>
+							<td class="distance-col">2 km</td>
+							<td>8:00</td>
+							<td>8:30</td>
+							<td>9:00</td>
+							<td>9:30</td>
+							<td>10:00</td>
+							<td>10:30</td>
+							<td>11:00</td>
+							<td>11:30</td>
+							<td>12:00</td>
+							<td>12:30</td>
+							<td>13:00</td>
+							<td>13:30</td>
+							<td>14:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">3 km</td>
+							<td>12:00</td>
+							<td>12:45</td>
+							<td>13:30</td>
+							<td>14:15</td>
+							<td>15:00</td>
+							<td>15:45</td>
+							<td>16:30</td>
+							<td>17:15</td>
+							<td>18:00</td>
+							<td>18:45</td>
+							<td>19:30</td>
+							<td>20:15</td>
+							<td>21:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">2 miles (3.22 km)</td>
+							<td>12:53</td>
+							<td>13:41</td>
+							<td>14:29</td>
+							<td>15:17</td>
+							<td>16:06</td>
+							<td>16:54</td>
+							<td>17:42</td>
+							<td>18:30</td>
+							<td>19:19</td>
+							<td>20:07</td>
+							<td>20:55</td>
+							<td>21:43</td>
+							<td>22:32</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">5 km</td>
+							<td>20:00</td>
+							<td>21:15</td>
+							<td>22:30</td>
+							<td>23:45</td>
+							<td>25:00</td>
+							<td>26:15</td>
+							<td>27:30</td>
+							<td>28:45</td>
+							<td>30:00</td>
+							<td>31:15</td>
+							<td>32:30</td>
+							<td>33:45</td>
+							<td>35:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">6 km</td>
+							<td>24:00</td>
+							<td>25:30</td>
+							<td>27:00</td>
+							<td>28:30</td>
+							<td>30:00</td>
+							<td>31:30</td>
+							<td>33:00</td>
+							<td>34:30</td>
+							<td>36:00</td>
+							<td>37:30</td>
+							<td>39:00</td>
+							<td>40:30</td>
+							<td>42:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">8 km</td>
+							<td>32:00</td>
+							<td>34:00</td>
+							<td>36:00</td>
+							<td>38:00</td>
+							<td>40:00</td>
+							<td>42:00</td>
+							<td>44:00</td>
+							<td>46:00</td>
+							<td>48:00</td>
+							<td>50:00</td>
+							<td>52:00</td>
+							<td>54:00</td>
+							<td>56:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">5 miles (8.05 km)</td>
+							<td>32:12</td>
+							<td>34:12</td>
+							<td>36:13</td>
+							<td>38:13</td>
+							<td>40:14</td>
+							<td>42:14</td>
+							<td>44:15</td>
+							<td>46:15</td>
+							<td>48:16</td>
+							<td>50:16</td>
+							<td>52:17</td>
+							<td>54:17</td>
+							<td>56:18</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">10 km</td>
+							<td>40:00</td>
+							<td>42:30</td>
+							<td>45:00</td>
+							<td>47:30</td>
+							<td>50:00</td>
+							<td>52:30</td>
+							<td>55:00</td>
+							<td>57:30</td>
+							<td>1:00:00</td>
+							<td>1:02:30</td>
+							<td>1:05:00</td>
+							<td>1:07:30</td>
+							<td>1:10:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">10 miles (16.09 km)</td>
+							<td>1:04:24</td>
+							<td>1:08:25</td>
+							<td>1:12:27</td>
+							<td>1:16:27</td>
+							<td>1:20:27</td>
+							<td>1:24:28</td>
+							<td>1:28:30</td>
+							<td>1:32:30</td>
+							<td>1:36:32</td>
+							<td>1:40:32</td>
+							<td>1:44:33</td>
+							<td>1:48:35</td>
+							<td>1:52:35</td>
+						</tr>
+						<tr>
+							<td class="distance-col">15 km</td>
+							<td>1:00:00</td>
+							<td>1:03:45</td>
+							<td>1:07:30</td>
+							<td>1:11:15</td>
+							<td>1:15:00</td>
+							<td>1:18:45</td>
+							<td>1:22:30</td>
+							<td>1:26:15</td>
+							<td>1:30:00</td>
+							<td>1:33:45</td>
+							<td>1:37:30</td>
+							<td>1:41:15</td>
+							<td>1:45:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">20 km</td>
+							<td>1:20:00</td>
+							<td>1:25:00</td>
+							<td>1:30:00</td>
+							<td>1:35:00</td>
+							<td>1:40:00</td>
+							<td>1:45:00</td>
+							<td>1:50:00</td>
+							<td>1:55:00</td>
+							<td>2:00:00</td>
+							<td>2:05:00</td>
+							<td>2:10:00</td>
+							<td>2:15:00</td>
+							<td>2:20:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">Half Marathon (21.1 km)</td>
+							<td>1:24:24</td>
+							<td>1:29:41</td>
+							<td>1:34:57</td>
+							<td>1:40:13</td>
+							<td>1:45:30</td>
+							<td>1:50:46</td>
+							<td>1:56:03</td>
+							<td>2:01:19</td>
+							<td>2:06:36</td>
+							<td>2:11:52</td>
+							<td>2:17:09</td>
+							<td>2:22:25</td>
+							<td>2:27:42</td>
+						</tr>
+						<tr>
+							<td class="distance-col">25 km</td>
+							<td>1:40:00</td>
+							<td>1:46:15</td>
+							<td>1:52:30</td>
+							<td>1:58:45</td>
+							<td>2:05:00</td>
+							<td>2:11:15</td>
+							<td>2:17:30</td>
+							<td>2:23:45</td>
+							<td>2:30:00</td>
+							<td>2:36:15</td>
+							<td>2:42:30</td>
+							<td>2:48:45</td>
+							<td>2:55:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">30 km</td>
+							<td>2:00:00</td>
+							<td>2:07:30</td>
+							<td>2:15:00</td>
+							<td>2:22:30</td>
+							<td>2:30:00</td>
+							<td>2:37:30</td>
+							<td>2:45:00</td>
+							<td>2:52:30</td>
+							<td>3:00:00</td>
+							<td>3:07:30</td>
+							<td>3:15:00</td>
+							<td>3:22:30</td>
+							<td>3:30:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">35 km</td>
+							<td>2:20:00</td>
+							<td>2:28:45</td>
+							<td>2:37:30</td>
+							<td>2:46:15</td>
+							<td>2:55:00</td>
+							<td>3:03:45</td>
+							<td>3:12:30</td>
+							<td>3:21:15</td>
+							<td>3:30:00</td>
+							<td>3:38:45</td>
+							<td>3:47:30</td>
+							<td>3:56:15</td>
+							<td>4:05:00</td>
+						</tr>
+						<tr>
+							<td class="distance-col">40 km</td>
+							<td>2:40:00</td>
+							<td>2:50:00</td>
+							<td>3:00:00</td>
+							<td>3:10:00</td>
+							<td>3:20:00</td>
+							<td>3:30:00</td>
+							<td>3:40:00</td>
+							<td>3:50:00</td>
+							<td>4:00:00</td>
+							<td>4:10:00</td>
+							<td>4:20:00</td>
+							<td>4:30:00</td>
+							<td>4:40:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">Marathon (42.2 km)</td>
+							<td>2:48:48</td>
+							<td>2:59:23</td>
+							<td>3:09:54</td>
+							<td>3:20:29</td>
+							<td>3:31:00</td>
+							<td>3:41:35</td>
+							<td>3:52:06</td>
+							<td>4:02:41</td>
+							<td>4:13:12</td>
+							<td>4:23:47</td>
+							<td>4:34:18</td>
+							<td>4:44:53</td>
+							<td>4:55:24</td>
+						</tr>
+						<tr>
+							<td class="distance-col">45 km</td>
+							<td>3:00:00</td>
+							<td>3:11:15</td>
+							<td>3:22:30</td>
+							<td>3:33:45</td>
+							<td>3:45:00</td>
+							<td>3:56:15</td>
+							<td>4:07:30</td>
+							<td>4:18:45</td>
+							<td>4:30:00</td>
+							<td>4:41:15</td>
+							<td>4:52:30</td>
+							<td>5:03:45</td>
+							<td>5:15:00</td>
+						</tr>
+						<tr class="special-distance">
+							<td class="distance-col">50 km</td>
+							<td>3:20:00</td>
+							<td>3:32:30</td>
+							<td>3:45:00</td>
+							<td>3:57:30</td>
+							<td>4:10:00</td>
+							<td>4:22:30</td>
+							<td>4:35:00</td>
+							<td>4:47:30</td>
+							<td>5:00:00</td>
+							<td>5:12:30</td>
+							<td>5:25:00</td>
+							<td>5:37:30</td>
+							<td>5:50:00</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			// Highlight the special distances
+			const specialDistances = document.querySelectorAll('.special-distance');
+			specialDistances.forEach(row => {
+				row.style.backgroundColor = '#e8f4fd';
+			});
+
+			// Pace calculator functionality
+			const distanceSelect = document.getElementById('distanceSelect');
+			const customDistanceDiv = document.getElementById('customDistanceDiv');
+			const customDistance = document.getElementById('customDistance');
+			const hours = document.getElementById('hours');
+			const minutes = document.getElementById('minutes');
+			const seconds = document.getElementById('seconds');
+			const calculateBtn = document.getElementById('calculateBtn');
+			const result = document.getElementById('result');
+			const paceResult = document.getElementById('paceResult');
+
+			// Show/hide custom distance input
+			distanceSelect.addEventListener('change', function () {
+				if (this.value === 'custom') {
+					customDistanceDiv.classList.add('show');
+				} else {
+					customDistanceDiv.classList.remove('show');
+				}
+			});
+
+			// Calculate pace
+			calculateBtn.addEventListener('click', function () {
+				// Get distance
+				let distance;
+				if (distanceSelect.value === 'custom') {
+					distance = parseFloat(customDistance.value);
+					if (isNaN(distance) || distance <= 0) {
+						alert('Please enter a valid distance');
+						return;
+					}
+				} else {
+					distance = parseFloat(distanceSelect.value);
+				}
+
+				// Get time in seconds
+				const hrs = parseInt(hours.value) || 0;
+				const mins = parseInt(minutes.value) || 0;
+				const secs = parseInt(seconds.value) || 0;
+
+				if (hrs === 0 && mins === 0 && secs === 0) {
+					alert('Please enter a valid time');
+					return;
+				}
+
+				const totalSeconds = (hrs * 3600) + (mins * 60) + secs;
+
+				// Calculate pace (time per km)
+				const paceSeconds = totalSeconds / distance;
+
+				// Format pace
+				const paceMinutes = Math.floor(paceSeconds / 60);
+				const paceRemainingSeconds = Math.round(paceSeconds % 60);
+				const formattedPace = `${paceMinutes}:${paceRemainingSeconds.toString().padStart(2, '0')} per km`;
+
+				// Display result
+				paceResult.textContent = formattedPace;
+				result.classList.add('show');
+			});
+		});
+	</script>
+</body>
+
+</html>
