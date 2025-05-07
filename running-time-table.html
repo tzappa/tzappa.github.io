@@ -54,8 +54,17 @@
 							</div>
 
 							<div id="result" class="result">
-								<h3 class="result-title">Your Pace</h3>
-								<p id="paceResult" class="result-value">--:-- min/km</p>
+								<h3 class="result-title">Your Results</h3>
+								<div class="result-values">
+									<div class="result-item">
+										<span class="result-label">Pace:</span>
+										<p id="paceResult" class="result-value">--:-- min/km</p>
+									</div>
+									<div class="result-item">
+										<span class="result-label">Speed:</span>
+										<p id="speedResult" class="result-value">--.-- km/h</p>
+									</div>
+								</div>
 							</div>
 
 							<button id="calculateBtn" class="calculate-button">
@@ -447,6 +456,7 @@
 			const calculateBtn = document.getElementById('calculateBtn');
 			const result = document.getElementById('result');
 			const paceResult = document.getElementById('paceResult');
+			const speedResult = document.getElementById('speedResult');
 
 			// Show/hide custom distance input
 			distanceSelect.addEventListener('change', function () {
@@ -458,7 +468,7 @@
 				}
 			});
 
-			// Function to calculate pace
+			// Function to calculate pace and speed
 			function calculatePace() {
 				// Get distance
 				let distance;
@@ -490,8 +500,13 @@
 				const paceRemainingSeconds = Math.round(paceSeconds % 60);
 				const formattedPace = `${paceMinutes}:${paceRemainingSeconds.toString().padStart(2, '0')} min/km`;
 
-				// Display result
+				// Calculate speed (km/h)
+				const speed = (distance / totalSeconds) * 3600;
+				const formattedSpeed = `${speed.toFixed(2)} km/h`;
+
+				// Display results
 				paceResult.textContent = formattedPace;
+				speedResult.textContent = formattedSpeed;
 				result.classList.add('show');
 			}
 

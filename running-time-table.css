@@ -205,3 +205,32 @@ body {
         font-size: 2.5rem;
     }
 }
+
+/* Result values layout */
+.result-values {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.result-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.result-label {
+    font-size: 0.9rem;
+    color: #d1d5db;
+}
+
+/* Media query for larger screens to put pace and speed side by side */
+@media (min-width: 480px) {
+    .result-values {
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+    }
+}
