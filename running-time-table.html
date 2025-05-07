@@ -454,18 +454,18 @@
 					customDistanceDiv.classList.add('show');
 				} else {
 					customDistanceDiv.classList.remove('show');
+					calculatePace(); // Calculate when switching between preset distances
 				}
 			});
 
-			// Calculate pace
-			calculateBtn.addEventListener('click', function () {
+			// Function to calculate pace
+			function calculatePace() {
 				// Get distance
 				let distance;
 				if (distanceSelect.value === 'custom') {
 					distance = parseFloat(customDistance.value);
 					if (isNaN(distance) || distance <= 0) {
-						alert('Please enter a valid distance');
-						return;
+						return; // Don't show alert, just exit the function
 					}
 				} else {
 					distance = parseFloat(distanceSelect.value);
@@ -477,8 +477,7 @@
 				const secs = parseInt(seconds.value) || 0;
 
 				if (hrs === 0 && mins === 0 && secs === 0) {
-					alert('Please enter a valid time');
-					return;
+					return; // Exit if no time provided
 				}
 
 				const totalSeconds = (hrs * 3600) + (mins * 60) + secs;
@@ -494,7 +493,16 @@
 				// Display result
 				paceResult.textContent = formattedPace;
 				result.classList.add('show');
-			});
+			}
+
+			// Add event listeners to calculate on input change
+			customDistance.addEventListener('input', calculatePace);
+			hours.addEventListener('input', calculatePace);
+			minutes.addEventListener('input', calculatePace);
+			seconds.addEventListener('input', calculatePace);
+
+			// Keep the button for accessibility
+			calculateBtn.addEventListener('click', calculatePace);
 		});
 	</script>
 </body>
