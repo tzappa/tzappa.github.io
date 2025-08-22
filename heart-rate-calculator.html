@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Rate Calculator - Tzappa's GitHub Pages</title>
+    <link rel="stylesheet" href="running-time-table.css">
+</head>
+<body>
+    <main class="calculator-container">
+        <div class="content-wrapper">
+            <header>
+                <h1 class="main-title">Heart Rate Calculator</h1>
+                <p class="section-title" style="text-align: center; margin-top: -1rem;">Calculate your maximum heart rate based on age</p>
+            </header>
+
+            <div class="calculator-layout">
+                <section class="calculator-form-section">
+                    <article class="card">
+                        <h2 class="section-title">Maximum Heart Rate Calculator</h2>
+                        <div class="form-container">
+                            <p>Calculate your maximum heart rate using the formula: <strong>211 - (0.64 × age)</strong></p>
+                            <div class="form-group">
+                                <label for="age">Enter your age:</label>
+                                <input type="number" id="age" class="form-control" min="1" max="120" placeholder="Enter age">
+                            </div>
+                            <button onclick="calculateHeartRate()" class="calculate-button">Calculate Maximum Heart Rate</button>
+                            <div id="result" class="result" style="display: none;">
+                                <div class="result-title">Your Maximum Heart Rate</div>
+                                <div class="result-value" id="heartRateResult"></div>
+                                <div style="margin-top: 1rem; font-size: 0.9rem; color: #d1d5db;">
+                                    <p><strong>Note:</strong> This is an estimate. Individual variations may occur.</p>
+                                    <p>Consult with healthcare professionals for personalized advice.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="time-table-section">
+                    <article class="card">
+                        <h2 class="section-title">Heart Rate Reference Table</h2>
+                        <div class="time-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Age</th>
+                                        <th>Maximum Heart Rate (bpm)</th>
+                                        <th>Target Heart Rate Zone (50-85%)</th>
+                                        <th>Moderate Exercise (50-70%)</th>
+                                        <th>Vigorous Exercise (70-85%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="heartRateTable">
+                                    <!-- Table will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </section>
+            </div>
+
+            <footer style="margin-top: 4rem; text-align: center; font-size: 0.9rem; opacity: 0.7;">
+                <p><a href="index.html" style="color: white; text-decoration: none;">← Back to Home</a> | &copy; 2025 Tzappa</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        function calculateHeartRate() {
+            const age = document.getElementById('age').value;
+            if (!age || age < 1 || age > 120) {
+                alert('Please enter a valid age between 1 and 120');
+                return;
+            }
+
+            const maxHeartRate = 211 - (0.64 * age);
+            const result = Math.round(maxHeartRate);
+            
+            document.getElementById('heartRateResult').textContent = result + ' bpm';
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function populateTable() {
+            const tableBody = document.getElementById('heartRateTable');
+            tableBody.innerHTML = '';
+
+            for (let age = 20; age <= 70; age += 5) {
+                const maxHeartRate = 211 - (0.64 * age);
+                const roundedMaxHR = Math.round(maxHeartRate);
+                const targetZoneMin = Math.round(roundedMaxHR * 0.5);
+                const targetZoneMax = Math.round(roundedMaxHR * 0.85);
+                const moderateMin = Math.round(roundedMaxHR * 0.5);
+                const moderateMax = Math.round(roundedMaxHR * 0.7);
+                const vigorousMin = Math.round(roundedMaxHR * 0.7);
+                const vigorousMax = Math.round(roundedMaxHR * 0.85);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight: 500;">${age}</td>
+                    <td style="color: #15803d; font-weight: 600;">${roundedMaxHR}</td>
+                    <td>${targetZoneMin} - ${targetZoneMax}</td>
+                    <td>${moderateMin} - ${moderateMax}</td>
+                    <td>${vigorousMin} - ${vigorousMax}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        // Populate table when page loads
+        document.addEventListener('DOMContentLoaded', populateTable);
+
+        // Allow Enter key to calculate
+        document.getElementById('age').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateHeartRate();
+            }
+        });
+    </script>
+</body>
+</html>
