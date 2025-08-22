@@ -46,9 +46,11 @@
                                     <tr>
                                         <th>Age</th>
                                         <th>Maximum Heart Rate (bpm)</th>
-                                        <th>Target Heart Rate Zone (50-85%)</th>
-                                        <th>Moderate Exercise (50-70%)</th>
-                                        <th>Vigorous Exercise (70-85%)</th>
+                                        <th>Zone 1 (51-60%)</th>
+                                        <th>Zone 2 (61-70%)</th>
+                                        <th>Zone 3 (71-80%)</th>
+                                        <th>Zone 4 (81-90%)</th>
+                                        <th>Zone 5 (91-100%)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="heartRateTable">
@@ -88,20 +90,28 @@
             for (let age = 20; age <= 70; age += 5) {
                 const maxHeartRate = 211 - (0.64 * age);
                 const roundedMaxHR = Math.round(maxHeartRate);
-                const targetZoneMin = Math.round(roundedMaxHR * 0.5);
-                const targetZoneMax = Math.round(roundedMaxHR * 0.85);
-                const moderateMin = Math.round(roundedMaxHR * 0.5);
-                const moderateMax = Math.round(roundedMaxHR * 0.7);
-                const vigorousMin = Math.round(roundedMaxHR * 0.7);
-                const vigorousMax = Math.round(roundedMaxHR * 0.85);
+                
+                // Calculate heart rate zones 1-5
+                const zone1Min = Math.round(roundedMaxHR * 0.51);
+                const zone1Max = Math.round(roundedMaxHR * 0.60);
+                const zone2Min = Math.round(roundedMaxHR * 0.61);
+                const zone2Max = Math.round(roundedMaxHR * 0.70);
+                const zone3Min = Math.round(roundedMaxHR * 0.71);
+                const zone3Max = Math.round(roundedMaxHR * 0.80);
+                const zone4Min = Math.round(roundedMaxHR * 0.81);
+                const zone4Max = Math.round(roundedMaxHR * 0.90);
+                const zone5Min = Math.round(roundedMaxHR * 0.91);
+                const zone5Max = Math.round(roundedMaxHR * 1.00);
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td style="font-weight: 500;">${age}</td>
                     <td style="color: #15803d; font-weight: 600;">${roundedMaxHR}</td>
-                    <td>${targetZoneMin} - ${targetZoneMax}</td>
-                    <td>${moderateMin} - ${moderateMax}</td>
-                    <td>${vigorousMin} - ${vigorousMax}</td>
+                    <td>${zone1Min} - ${zone1Max}</td>
+                    <td>${zone2Min} - ${zone2Max}</td>
+                    <td>${zone3Min} - ${zone3Max}</td>
+                    <td>${zone4Min} - ${zone4Max}</td>
+                    <td>${zone5Min} - ${zone5Max}</td>
                 `;
                 tableBody.appendChild(row);
             }
