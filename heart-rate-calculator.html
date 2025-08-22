@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heart Rate Calculator - Tzappa's GitHub Pages</title>
+    <title>Heart Rate Zones Calculator - Tzappa's GitHub Pages</title>
     <link rel="stylesheet" href="running-time-table.css">
 </head>
 <body>
     <main class="calculator-container">
         <div class="content-wrapper">
             <header>
-                <h1 class="main-title">Heart Rate Calculator</h1>
-                <p class="section-title" style="text-align: center; margin-top: -1rem;">Calculate your maximum heart rate based on age</p>
+                <h1 class="main-title">Heart Rate Zones Calculator</h1>
+                <p class="section-title" style="text-align: center; margin-top: -1rem;">Calculate your maximum heart rate and training zones based on age</p>
             </header>
 
             <div class="calculator-layout">
                 <section class="calculator-form-section">
                     <article class="card">
-                        <h2 class="section-title">Maximum Heart Rate Calculator</h2>
+                        <h2 class="section-title">Maximum Heart Rate & Zones Calculator</h2>
                         <div class="form-container">
                             <p>Calculate your maximum heart rate using the formula: <strong>211 - (0.64 × age)</strong></p>
                             <div class="form-group">
@@ -39,7 +39,7 @@
 
                 <section class="time-table-section">
                     <article class="card">
-                        <h2 class="section-title">Heart Rate Reference Table</h2>
+                        <h2 class="section-title">Heart Rate Zones Reference Table</h2>
                         <div class="time-table">
                             <table>
                                 <thead>
@@ -106,12 +106,12 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td style="font-weight: 500;">${age}</td>
-                    <td style="color: #15803d; font-weight: 600;">${roundedMaxHR}</td>
-                    <td>${zone1Min} - ${zone1Max}</td>
-                    <td>${zone2Min} - ${zone2Max}</td>
-                    <td>${zone3Min} - ${zone3Max}</td>
-                    <td>${zone4Min} - ${zone4Max}</td>
-                    <td>${zone5Min} - ${zone5Max}</td>
+                    <td style="color: #f25050; font-weight: 600;">${roundedMaxHR}</td>
+                    <td class="zone1">${zone1Min} - ${zone1Max}</td>
+                    <td class="zone2">${zone2Min} - ${zone2Max}</td>
+                    <td class="zone3">${zone3Min} - ${zone3Max}</td>
+                    <td class="zone4">${zone4Min} - ${zone4Max}</td>
+                    <td class="zone5">${zone5Min} - ${zone5Max}</td>
                 `;
                 tableBody.appendChild(row);
             }
