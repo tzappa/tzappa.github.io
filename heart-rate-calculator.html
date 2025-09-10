@@ -58,14 +58,21 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Age</th>
-                                        <th>Sex</th>
-                                        <th>Maximum Heart Rate (bpm)</th>
+                                        <th rowspan="2">Age</th>
+                                        <th rowspan="2">Sex</th>
+                                        <th rowspan="2">Maximum Heart Rate (bpm)</th>
                                         <th>Zone 1 (51-60%)</th>
                                         <th>Zone 2 (61-70%)</th>
                                         <th>Zone 3 (71-80%)</th>
                                         <th>Zone 4 (81-90%)</th>
                                         <th>Zone 5 (91-100%)</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 0.8rem; font-weight: 400; color: #9ca3af; padding-top: 0;">Recovery/Easy</th>
+                                        <th style="font-size: 0.8rem; font-weight: 400; color: #9ca3af; padding-top: 0;">Aerobic Base</th>
+                                        <th style="font-size: 0.8rem; font-weight: 400; color: #9ca3af; padding-top: 0;">Aerobic Threshold</th>
+                                        <th style="font-size: 0.8rem; font-weight: 400; color: #9ca3af; padding-top: 0;">Lactate Threshold</th>
+                                        <th style="font-size: 0.8rem; font-weight: 400; color: #9ca3af; padding-top: 0;">Neuromuscular Power</th>
                                     </tr>
                                 </thead>
                                 <tbody id="heartRateTable">
@@ -145,26 +152,31 @@
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 1</div>
                     <div style="font-size: 0.8rem; color: #d1d5db;">${zone1Min} - ${zone1Max} bpm</div>
                     <div style="font-size: 0.7rem; color: #9ca3af;">51-60%</div>
+                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Recovery/Easy</div>
                 </div>
                 <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 2</div>
                     <div style="font-size: 0.8rem; color: #d1d5db;">${zone2Min} - ${zone2Max} bpm</div>
                     <div style="font-size: 0.7rem; color: #9ca3af;">61-70%</div>
+                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Aerobic Base</div>
                 </div>
                 <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 3</div>
                     <div style="font-size: 0.8rem; color: #d1d5db;">${zone3Min} - ${zone3Max} bpm</div>
                     <div style="font-size: 0.7rem; color: #9ca3af;">71-80%</div>
+                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Aerobic Threshold</div>
                 </div>
                 <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 4</div>
                     <div style="font-size: 0.8rem; color: #d1d5db;">${zone4Min} - ${zone4Max} bpm</div>
                     <div style="font-size: 0.7rem; color: #9ca3af;">81-90%</div>
+                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Lactate Threshold</div>
                 </div>
                 <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
                     <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 5</div>
                     <div style="font-size: 0.8rem; color: #d1d5db;">${zone5Min} - ${zone5Max} bpm</div>
                     <div style="font-size: 0.7rem; color: #9ca3af;">91-100%</div>
+                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Neuromuscular Power</div>
                 </div>
             `;
             
