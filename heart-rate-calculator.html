@@ -62,10 +62,6 @@
                 <section class="time-table-section">
                     <article class="card">
                         <h2 class="section-title">Heart Rate Zones Reference Table</h2>
-                        <div id="currentZones" class="current-zones" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 4px solid #3b82f6;">
-                            <h3 style="margin: 0 0 0.5rem 0; color: #3b82f6; font-size: 1.1rem;">Your Current Heart Rate Zones</h3>
-                            <div id="currentZonesContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; font-size: 0.9rem;"></div>
-                        </div>
                         <div class="time-table">
                             <table>
                                 <thead id="tableHeader">
@@ -110,7 +106,6 @@
             
             if (!age || age < 1 || age > 120) {
                 alert('Please enter a valid age between 1 and 120');
-                hideCurrentZones();
                 return;
             }
             
@@ -118,7 +113,6 @@
             const needsSex = formula === 'wingate';
             if (needsSex && !sex) {
                 alert('Please select your sex');
-                hideCurrentZones();
                 return;
             }
 
@@ -127,9 +121,6 @@
             
             document.getElementById('heartRateResult').textContent = result + ' bpm';
             document.getElementById('result').style.display = 'block';
-            
-            // Display current heart rate zones
-            displayCurrentZones(result, sex, age);
         }
 
         function calculateMaxHeartRate(age, sex, formula) {
@@ -149,10 +140,6 @@
                 default:
                     return sex === 'male' ? 208.609 - (0.716 * age) : 209.273 - (0.804 * age);
             }
-        }
-
-        function hideCurrentZones() {
-            document.getElementById('currentZones').style.display = 'none';
         }
 
         function updateFormulaDescription() {
@@ -204,62 +191,6 @@
                 // Clear sex selection when not needed
                 document.getElementById('sex').value = '';
             }
-        }
-
-        function displayCurrentZones(maxHeartRate, sex, age) {
-            // Calculate heart rate zones
-            const zone1Min = Math.round(maxHeartRate * 0.51);
-            const zone1Max = Math.round(maxHeartRate * 0.60);
-            const zone2Min = Math.round(maxHeartRate * 0.61);
-            const zone2Max = Math.round(maxHeartRate * 0.70);
-            const zone3Min = Math.round(maxHeartRate * 0.71);
-            const zone3Max = Math.round(maxHeartRate * 0.80);
-            const zone4Min = Math.round(maxHeartRate * 0.81);
-            const zone4Max = Math.round(maxHeartRate * 0.90);
-            const zone5Min = Math.round(maxHeartRate * 0.91);
-            const zone5Max = Math.round(maxHeartRate * 1.00);
-
-            const sexDisplay = sex === 'male' ? 'Male' : 'Female';
-            const zonesContent = document.getElementById('currentZonesContent');
-            
-            zonesContent.innerHTML = `
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; color: #f25050; margin-bottom: 0.25rem;">Max HR: ${maxHeartRate} bpm</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${sexDisplay}, Age ${age}</div>
-                </div>
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 1</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${zone1Min} - ${zone1Max} bpm</div>
-                    <div style="font-size: 0.7rem; color: #9ca3af;">51-60%</div>
-                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Recovery/Easy</div>
-                </div>
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 2</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${zone2Min} - ${zone2Max} bpm</div>
-                    <div style="font-size: 0.7rem; color: #9ca3af;">61-70%</div>
-                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Aerobic Base</div>
-                </div>
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 3</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${zone3Min} - ${zone3Max} bpm</div>
-                    <div style="font-size: 0.7rem; color: #9ca3af;">71-80%</div>
-                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Aerobic Threshold</div>
-                </div>
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 4</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${zone4Min} - ${zone4Max} bpm</div>
-                    <div style="font-size: 0.7rem; color: #9ca3af;">81-90%</div>
-                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Lactate Threshold</div>
-                </div>
-                <div style="text-align: center; padding: 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px;">
-                    <div style="font-weight: 600; margin-bottom: 0.25rem;">Zone 5</div>
-                    <div style="font-size: 0.8rem; color: #d1d5db;">${zone5Min} - ${zone5Max} bpm</div>
-                    <div style="font-size: 0.7rem; color: #9ca3af;">91-100%</div>
-                    <div style="font-size: 0.6rem; color: #6b7280; margin-top: 0.25rem;">Neuromuscular Power</div>
-                </div>
-            `;
-            
-            document.getElementById('currentZones').style.display = 'block';
         }
 
         function populateTable() {
@@ -398,15 +329,11 @@
         document.getElementById('sex').addEventListener('change', function(e) {
             if (e.target.value && document.getElementById('age').value) {
                 calculateHeartRate();
-            } else if (!e.target.value) {
-                hideCurrentZones();
             }
         });
         
         document.getElementById('age').addEventListener('input', function(e) {
-            if (!e.target.value) {
-                hideCurrentZones();
-            }
+            // Age input event - no action needed for current zones
         });
     </script>
 </body>
