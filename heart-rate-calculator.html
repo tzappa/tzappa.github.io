@@ -17,11 +17,20 @@
             <div class="calculator-layout">
                 <section class="calculator-form-section">
                     <article class="card">
-                        <h2 class="section-title">Maximum Heart Rate & Zones Calculator</h2>
+                        <h2 class="section-title">Maximum Heart Rate Calculator</h2>
                         <div class="form-container">
-                            <p>Calculate your maximum heart rate using sex-specific formulas:</p>
-                            <p><strong>Males:</strong> 208.609 - (0.716 × age)</p>
-                            <p><strong>Females:</strong> 209.273 - (0.804 × age)</p>
+                            <p>Calculate your maximum heart rate using various research-based formulas:</p>
+                            <div class="form-group">
+                                <label for="formula">Select formula:</label>
+                                <select id="formula" class="form-control">
+                                    <option value="wingate">Wingate (2015)</option>
+                                    <option value="nes">Nes (2013)</option>
+                                    <option value="oakland">Oakland University (2007)</option>
+                                    <option value="tanaka">Tanaka, Monahan & Seals (2001)</option>
+                                    <option value="inbar">Inbar (1994)</option>
+                                    <option value="haskell">Haskell & Fox (1971)</option>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="sex">Select your sex:</label>
                                 <select id="sex" class="form-control">
@@ -33,6 +42,9 @@
                             <div class="form-group">
                                 <label for="age">Enter your age:</label>
                                 <input type="number" id="age" class="form-control" min="1" max="120" placeholder="Enter age">
+                            </div>
+                            <div id="formulaDescription" class="formula-description" style="margin-top: 1rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 3px solid #3b82f6; font-size: 0.9rem;">
+                                <strong>Selected Formula:</strong> <span id="formulaText">Wingate (2015) - Males: 208.609 - (0.716 × age), Females: 209.273 - (0.804 × age)</span>
                             </div>
                             <button onclick="calculateHeartRate()" class="calculate-button">Calculate Maximum Heart Rate</button>
                             <div id="result" class="result" style="display: none;">
@@ -56,10 +68,10 @@
                         </div>
                         <div class="time-table">
                             <table>
-                                <thead>
+                                <thead id="tableHeader">
                                     <tr>
                                         <th rowspan="2">Age</th>
-                                        <th rowspan="2">Sex</th>
+                                        <th rowspan="2" id="sexHeader" style="display: table-cell;">Sex</th>
                                         <th rowspan="2">Maximum Heart Rate (bpm)</th>
                                         <th>Zone 1 (51-60%)</th>
                                         <th>Zone 2 (61-70%)</th>
@@ -94,6 +106,7 @@
         function calculateHeartRate() {
             const age = document.getElementById('age').value;
             const sex = document.getElementById('sex').value;
+            const formula = document.getElementById('formula').value;
             
             if (!age || age < 1 || age > 120) {
                 alert('Please enter a valid age between 1 and 120');
@@ -101,19 +114,15 @@
                 return;
             }
             
-            if (!sex) {
+            // Only require sex for formulas that need it
+            const needsSex = formula === 'wingate';
+            if (needsSex && !sex) {
                 alert('Please select your sex');
                 hideCurrentZones();
                 return;
             }
 
-            let maxHeartRate;
-            if (sex === 'male') {
-                maxHeartRate = 208.609 - (0.716 * age);
-            } else if (sex === 'female') {
-                maxHeartRate = 209.273 - (0.804 * age);
-            }
-            
+            let maxHeartRate = calculateMaxHeartRate(age, sex, formula);
             const result = Math.round(maxHeartRate);
             
             document.getElementById('heartRateResult').textContent = result + ' bpm';
@@ -123,8 +132,78 @@
             displayCurrentZones(result, sex, age);
         }
 
+        function calculateMaxHeartRate(age, sex, formula) {
+            switch(formula) {
+                case 'wingate':
+                    return sex === 'male' ? 208.609 - (0.716 * age) : 209.273 - (0.804 * age);
+                case 'haskell':
+                    return 220 - age;
+                case 'inbar':
+                    return 205.8 - (0.685 * age);
+                case 'tanaka':
+                    return 208 - (0.7 * age);
+                case 'oakland':
+                    return 192 - (0.007 * age * age);
+                case 'nes':
+                    return 211 - (0.64 * age);
+                default:
+                    return sex === 'male' ? 208.609 - (0.716 * age) : 209.273 - (0.804 * age);
+            }
+        }
+
         function hideCurrentZones() {
             document.getElementById('currentZones').style.display = 'none';
+        }
+
+        function updateFormulaDescription() {
+            const formula = document.getElementById('formula').value;
+            const sex = document.getElementById('sex').value;
+            const formulaText = document.getElementById('formulaText');
+            const sexGroup = document.getElementById('sex').closest('.form-group');
+            
+            let description = '';
+            let needsSex = false;
+            
+            switch(formula) {
+                case 'wingate':
+                    description = 'Wingate (2015) - Males: 208.609 - (0.716 × age), Females: 209.273 - (0.804 × age)';
+                    needsSex = true;
+                    break;
+                case 'haskell':
+                    description = 'Haskell & Fox (1971) - 220 - age';
+                    needsSex = false;
+                    break;
+                case 'inbar':
+                    description = 'Inbar (1994) - 205.8 - (0.685 × age)';
+                    needsSex = false;
+                    break;
+                case 'tanaka':
+                    description = 'Tanaka, Monahan & Seals (2001) - 208 - (0.7 × age)';
+                    needsSex = false;
+                    break;
+                case 'oakland':
+                    description = 'Oakland University (2007) - 192 - (0.007 × age²)';
+                    needsSex = false;
+                    break;
+                case 'nes':
+                    description = 'Nes (2013) - 211 - (0.64 × age)';
+                    needsSex = false;
+                    break;
+                default:
+                    description = 'Wingate (2015) - Males: 208.609 - (0.716 × age), Females: 209.273 - (0.804 × age)';
+                    needsSex = true;
+            }
+            
+            formulaText.textContent = description;
+            
+            // Show/hide sex selector based on formula
+            if (needsSex) {
+                sexGroup.style.display = 'block';
+            } else {
+                sexGroup.style.display = 'none';
+                // Clear sex selection when not needed
+                document.getElementById('sex').value = '';
+            }
         }
 
         function displayCurrentZones(maxHeartRate, sex, age) {
@@ -185,77 +264,134 @@
 
         function populateTable() {
             const tableBody = document.getElementById('heartRateTable');
+            const sexHeader = document.getElementById('sexHeader');
             tableBody.innerHTML = '';
 
+            // Get current formula selection
+            const formula = document.getElementById('formula').value;
+            const needsSex = formula === 'wingate';
+
+            // Show/hide sex column header
+            if (needsSex) {
+                sexHeader.style.display = 'table-cell';
+            } else {
+                sexHeader.style.display = 'none';
+            }
+
             for (let age = 20; age <= 70; age += 5) {
-                // Calculate for both male and female
-                const maleMaxHR = 208.609 - (0.716 * age);
-                const femaleMaxHR = 209.273 - (0.804 * age);
-                
-                const roundedMaleMaxHR = Math.round(maleMaxHR);
-                const roundedFemaleMaxHR = Math.round(femaleMaxHR);
-                
-                // Calculate heart rate zones for male
-                const maleZone1Min = Math.round(roundedMaleMaxHR * 0.51);
-                const maleZone1Max = Math.round(roundedMaleMaxHR * 0.60);
-                const maleZone2Min = Math.round(roundedMaleMaxHR * 0.61);
-                const maleZone2Max = Math.round(roundedMaleMaxHR * 0.70);
-                const maleZone3Min = Math.round(roundedMaleMaxHR * 0.71);
-                const maleZone3Max = Math.round(roundedMaleMaxHR * 0.80);
-                const maleZone4Min = Math.round(roundedMaleMaxHR * 0.81);
-                const maleZone4Max = Math.round(roundedMaleMaxHR * 0.90);
-                const maleZone5Min = Math.round(roundedMaleMaxHR * 0.91);
-                const maleZone5Max = Math.round(roundedMaleMaxHR * 1.00);
+                if (needsSex) {
+                    // Calculate for both male and female using Wingate formula
+                    const maleMaxHR = calculateMaxHeartRate(age, 'male', 'wingate');
+                    const femaleMaxHR = calculateMaxHeartRate(age, 'female', 'wingate');
+                    
+                    const roundedMaleMaxHR = Math.round(maleMaxHR);
+                    const roundedFemaleMaxHR = Math.round(femaleMaxHR);
+                    
+                    // Calculate heart rate zones for male
+                    const maleZone1Min = Math.round(roundedMaleMaxHR * 0.51);
+                    const maleZone1Max = Math.round(roundedMaleMaxHR * 0.60);
+                    const maleZone2Min = Math.round(roundedMaleMaxHR * 0.61);
+                    const maleZone2Max = Math.round(roundedMaleMaxHR * 0.70);
+                    const maleZone3Min = Math.round(roundedMaleMaxHR * 0.71);
+                    const maleZone3Max = Math.round(roundedMaleMaxHR * 0.80);
+                    const maleZone4Min = Math.round(roundedMaleMaxHR * 0.81);
+                    const maleZone4Max = Math.round(roundedMaleMaxHR * 0.90);
+                    const maleZone5Min = Math.round(roundedMaleMaxHR * 0.91);
+                    const maleZone5Max = Math.round(roundedMaleMaxHR * 1.00);
 
-                // Calculate heart rate zones for female
-                const femaleZone1Min = Math.round(roundedFemaleMaxHR * 0.51);
-                const femaleZone1Max = Math.round(roundedFemaleMaxHR * 0.60);
-                const femaleZone2Min = Math.round(roundedFemaleMaxHR * 0.61);
-                const femaleZone2Max = Math.round(roundedFemaleMaxHR * 0.70);
-                const femaleZone3Min = Math.round(roundedFemaleMaxHR * 0.71);
-                const femaleZone3Max = Math.round(roundedFemaleMaxHR * 0.80);
-                const femaleZone4Min = Math.round(roundedFemaleMaxHR * 0.81);
-                const femaleZone4Max = Math.round(roundedFemaleMaxHR * 0.90);
-                const femaleZone5Min = Math.round(roundedFemaleMaxHR * 0.91);
-                const femaleZone5Max = Math.round(roundedFemaleMaxHR * 1.00);
+                    // Calculate heart rate zones for female
+                    const femaleZone1Min = Math.round(roundedFemaleMaxHR * 0.51);
+                    const femaleZone1Max = Math.round(roundedFemaleMaxHR * 0.60);
+                    const femaleZone2Min = Math.round(roundedFemaleMaxHR * 0.61);
+                    const femaleZone2Max = Math.round(roundedFemaleMaxHR * 0.70);
+                    const femaleZone3Min = Math.round(roundedFemaleMaxHR * 0.71);
+                    const femaleZone3Max = Math.round(roundedFemaleMaxHR * 0.80);
+                    const femaleZone4Min = Math.round(roundedFemaleMaxHR * 0.81);
+                    const femaleZone4Max = Math.round(roundedFemaleMaxHR * 0.90);
+                    const femaleZone5Min = Math.round(roundedFemaleMaxHR * 0.91);
+                    const femaleZone5Max = Math.round(roundedFemaleMaxHR * 1.00);
 
-                // Create male row
-                const maleRow = document.createElement('tr');
-                maleRow.innerHTML = `
-                    <td style="font-weight: 500;">${age}</td>
-                    <td style="font-weight: 500; color: #3b82f6;">Male</td>
-                    <td style="color: #f25050; font-weight: 600;">${roundedMaleMaxHR}</td>
-                    <td class="zone1">${maleZone1Min} - ${maleZone1Max}</td>
-                    <td class="zone2">${maleZone2Min} - ${maleZone2Max}</td>
-                    <td class="zone3">${maleZone3Min} - ${maleZone3Max}</td>
-                    <td class="zone4">${maleZone4Min} - ${maleZone4Max}</td>
-                    <td class="zone5">${maleZone5Min} - ${maleZone5Max}</td>
-                `;
-                tableBody.appendChild(maleRow);
+                    // Create male row
+                    const maleRow = document.createElement('tr');
+                    maleRow.innerHTML = `
+                        <td style="font-weight: 500;">${age}</td>
+                        <td style="font-weight: 500; color: #3b82f6;">Male</td>
+                        <td style="color: #f25050; font-weight: 600;">${roundedMaleMaxHR}</td>
+                        <td class="zone1">${maleZone1Min} - ${maleZone1Max}</td>
+                        <td class="zone2">${maleZone2Min} - ${maleZone2Max}</td>
+                        <td class="zone3">${maleZone3Min} - ${maleZone3Max}</td>
+                        <td class="zone4">${maleZone4Min} - ${maleZone4Max}</td>
+                        <td class="zone5">${maleZone5Min} - ${maleZone5Max}</td>
+                    `;
+                    tableBody.appendChild(maleRow);
 
-                // Create female row
-                const femaleRow = document.createElement('tr');
-                femaleRow.innerHTML = `
-                    <td style="font-weight: 500;">${age}</td>
-                    <td style="font-weight: 500; color: #ec4899;">Female</td>
-                    <td style="color: #f25050; font-weight: 600;">${roundedFemaleMaxHR}</td>
-                    <td class="zone1">${femaleZone1Min} - ${femaleZone1Max}</td>
-                    <td class="zone2">${femaleZone2Min} - ${femaleZone2Max}</td>
-                    <td class="zone3">${femaleZone3Min} - ${femaleZone3Max}</td>
-                    <td class="zone4">${femaleZone4Min} - ${femaleZone4Max}</td>
-                    <td class="zone5">${femaleZone5Min} - ${femaleZone5Max}</td>
-                `;
-                tableBody.appendChild(femaleRow);
+                    // Create female row
+                    const femaleRow = document.createElement('tr');
+                    femaleRow.innerHTML = `
+                        <td style="font-weight: 500;">${age}</td>
+                        <td style="font-weight: 500; color: #ec4899;">Female</td>
+                        <td style="color: #f25050; font-weight: 600;">${roundedFemaleMaxHR}</td>
+                        <td class="zone1">${femaleZone1Min} - ${femaleZone1Max}</td>
+                        <td class="zone2">${femaleZone2Min} - ${femaleZone2Max}</td>
+                        <td class="zone3">${femaleZone3Min} - ${femaleZone3Max}</td>
+                        <td class="zone4">${femaleZone4Min} - ${femaleZone4Max}</td>
+                        <td class="zone5">${femaleZone5Min} - ${femaleZone5Max}</td>
+                    `;
+                    tableBody.appendChild(femaleRow);
+                } else {
+                    // Calculate using universal formula (no sex needed)
+                    const maxHR = calculateMaxHeartRate(age, '', formula);
+                    const roundedMaxHR = Math.round(maxHR);
+                    
+                    // Calculate heart rate zones
+                    const zone1Min = Math.round(roundedMaxHR * 0.51);
+                    const zone1Max = Math.round(roundedMaxHR * 0.60);
+                    const zone2Min = Math.round(roundedMaxHR * 0.61);
+                    const zone2Max = Math.round(roundedMaxHR * 0.70);
+                    const zone3Min = Math.round(roundedMaxHR * 0.71);
+                    const zone3Max = Math.round(roundedMaxHR * 0.80);
+                    const zone4Min = Math.round(roundedMaxHR * 0.81);
+                    const zone4Max = Math.round(roundedMaxHR * 0.90);
+                    const zone5Min = Math.round(roundedMaxHR * 0.91);
+                    const zone5Max = Math.round(roundedMaxHR * 1.00);
+
+                    // Create single row
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-weight: 500;">${age}</td>
+                        <td style="color: #f25050; font-weight: 600;">${roundedMaxHR}</td>
+                        <td class="zone1">${zone1Min} - ${zone1Max}</td>
+                        <td class="zone2">${zone2Min} - ${zone2Max}</td>
+                        <td class="zone3">${zone3Min} - ${zone3Max}</td>
+                        <td class="zone4">${zone4Min} - ${zone4Max}</td>
+                        <td class="zone5">${zone5Min} - ${zone5Max}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
             }
         }
 
         // Populate table when page loads
-        document.addEventListener('DOMContentLoaded', populateTable);
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable();
+            updateFormulaDescription();
+        });
 
         // Allow Enter key to calculate
         document.getElementById('age').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 calculateHeartRate();
+            }
+        });
+        
+        document.getElementById('formula').addEventListener('change', function(e) {
+            updateFormulaDescription();
+            populateTable(); // Repopulate table with new formula
+            if (e.target.value && document.getElementById('age').value) {
+                const needsSex = e.target.value === 'wingate';
+                if (!needsSex || document.getElementById('sex').value) {
+                    calculateHeartRate();
+                }
             }
         });
         
