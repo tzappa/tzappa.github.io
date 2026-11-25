@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЕГН четец</title>
+    <link rel="stylesheet" href="running-time-table.css">
+    <style>
+        .egn-input {
+            padding: 0.75rem;
+            font-size: 1.75rem;
+            letter-spacing: 0.3em;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+        .egn-input.valid { border-color: #15803d; }
+        .egn-input.invalid { border-color: #b91c1c; }
+        .egn-status {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .egn-status.valid { background-color: rgba(21, 128, 61, 0.35); }
+        .egn-status.invalid { background-color: rgba(185, 28, 28, 0.35); }
+        .egn-status.hint { background-color: rgba(255, 255, 255, 0.08); font-weight: 400; }
+        .egn-errors { margin: 0.75rem 0 0 1.25rem; }
+        .egn-errors li { margin-bottom: 0.25rem; }
+        .egn-details { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .egn-details th, .egn-details td {
+            padding: 0.6rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            vertical-align: top;
+        }
+        .egn-details th { width: 45%; font-weight: 400; opacity: 0.75; }
+        .egn-details td { font-weight: 600; }
+        .egn-digits { display: flex; justify-content: center; gap: 0.2rem; margin-top: 1.25rem; }
+        .egn-digits span {
+            flex: 0 1 1.9rem;
+            min-width: 0;
+            padding: 0.35rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-radius: 0.3rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .d-date { background-color: #1d4ed8; }
+        .d-region { background-color: #a16207; }
+        .d-check { background-color: #15803d; }
+        .d-check.bad { background-color: #b91c1c; }
+        .egn-legend { display: flex; justify-content: center; gap: 1rem; margin-top: 0.6rem; font-size: 0.85rem; flex-wrap: wrap; }
+        .egn-legend i { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 0.15rem; margin-right: 0.3rem; }
+        .egn-note { font-size: 0.85rem; opacity: 0.7; }
+        .back-link { color: #4ade80; }
+    </style>
+</head>
+<body>
+    <main class="calculator-container">
+        <div class="content-wrapper">
+            <header>
+                <h1 class="main-title">ЕГН четец</h1>
+            </header>
+
+            <div class="calculator-layout">
+                <section class="calculator-form-section">
+                    <article class="card">
+                        <h2 class="section-title">Проверка на ЕГН</h2>
+                        <div class="form-container">
+                            <div class="form-group">
+                                <label for="egn">Въведете 10-цифрено ЕГН</label>
+                                <input id="egn" class="form-control egn-input" type="text" inputmode="numeric"
+                                       autocomplete="off" maxlength="10" placeholder="0000000000">
+                            </div>
+                            <div id="status" class="egn-status hint">Въведете ЕГН, за да го проверите.</div>
+                            <div id="output"></div>
+                            <p class="egn-note">Проверката се извършва изцяло във вашия браузър — въведеното ЕГН не се изпраща никъде.</p>
+                        </div>
+                    </article>
+                </section>
+
+                <p style="text-align: center;"><a class="back-link" href="index.html">&larr; Към началото</a></p>
+            </div>
+        </div>
+    </main>
+
+<script>
+(function () {
+    'use strict';
+
+    // Тегла за изчисляване на контролната (10-та) цифра.
+    var WEIGHTS = [2, 4, 8, 5, 10, 9, 7, 3, 6];
+
+    // Области според цифри 7-9: [последен номер за областта, име].
+    var REGIONS = [
+        [43, 'Благоевград'], [93, 'Бургас'], [139, 'Варна'], [169, 'Велико Търново'],
+        [183, 'Видин'], [217, 'Враца'], [233, 'Габрово'], [281, 'Кърджали'],
+        [301, 'Кюстендил'], [319, 'Ловеч'], [341, 'Монтана'], [377, 'Пазарджик'],
+        [395, 'Перник'], [435, 'Плевен'], [501, 'Пловдив'], [527, 'Разград'],
+        [555, 'Русе'], [575, 'Силистра'], [601, 'Сливен'], [623, 'Смолян'],
+        [721, 'София – град'], [751, 'София – област'], [789, 'Стара Загора'],
+        [821, 'Добрич'], [843, 'Търговище'], [871, 'Хасково'], [903, 'Шумен'],
+        [925, 'Ямбол'], [999, 'Друг / неизвестен']
+    ];
+
+    var WEEKDAYS = ['неделя', 'понеделник', 'вторник', 'сряда', 'четвъртък', 'петък', 'събота'];
+    var MONTHS = ['януари', 'февруари', 'март', 'април', 'май', 'юни', 'юли', 'август',
+                  'септември', 'октомври', 'ноември', 'декември'];
+
+    function checkDigit(egn) {
+        var sum = 0;
+        for (var i = 0; i < 9; i++) sum += Number(egn[i]) * WEIGHTS[i];
+        var rem = sum % 11;
+        return rem === 10 ? 0 : rem;
+    }
+
+    function findRegion(code) {
+        var start = 0;
+        for (var i = 0; i < REGIONS.length; i++) {
+            if (code <= REGIONS[i][0]) return { name: REGIONS[i][1], start: start };
+            start = REGIONS[i][0] + 1;
+        }
+        return null;
+    }
+
+    function ageOn(birth, today) {
+        var years = today.getFullYear() - birth.getFullYear();
+        var m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) years--;
+        return years;
+    }
+
+    function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+    /**
+     * Разчита ЕГН. Връща { valid, errors[], ... данни, които могат да се извлекат }.
+     */
+    function parseEgn(egn, today) {
+        var r = { valid: false, errors: [] };
+        if (!/^\d{10}$/.test(egn)) {
+            r.errors.push('ЕГН трябва да съдържа точно 10 цифри.');
+            return r;
+        }
+
+        // Дата на раждане: към месеца се добавя 20 за родени преди 1900 и 40 за родени след 1999.
+        var yy = Number(egn.substr(0, 2));
+        var mm = Number(egn.substr(2, 2));
+        var dd = Number(egn.substr(4, 2));
+        var year, month;
+        if (mm >= 1 && mm <= 12) { year = 1900 + yy; month = mm; }
+        else if (mm >= 21 && mm <= 32) { year = 1800 + yy; month = mm - 20; }
+        else if (mm >= 41 && mm <= 52) { year = 2000 + yy; month = mm - 40; }
+
+        if (month) {
+            var d = new Date(year, month - 1, dd);
+            if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === dd) {
+                r.birth = d;
+                if (d > today) r.errors.push('Датата на раждане е в бъдещето.');
+                else r.age = ageOn(d, today);
+            } else {
+                r.errors.push('Невалидна дата на раждане: ' + pad(dd) + '.' + pad(month) + '.' + year + ' не съществува.');
+            }
+        } else {
+            r.errors.push('Невалиден месец (' + pad(mm) + ').');
+        }
+
+        // Цифри 7-9: област и пореден номер; 9-та цифра определя пола (четна – мъж).
+        var code = Number(egn.substr(6, 3));
+        r.male = Number(egn[8]) % 2 === 0;
+        var region = findRegion(code);
+        r.region = region.name;
+        r.order = Math.floor((code - region.start) / 2) + 1;
+
+        // Контролна цифра.
+        r.expectedCheck = checkDigit(egn);
+        r.checkOk = r.expectedCheck === Number(egn[9]);
+        if (!r.checkOk) {
+            r.errors.push('Грешна контролна цифра: очаква се ' + r.expectedCheck + ', а е ' + egn[9] + '.');
+        }
+
+        r.valid = r.errors.length === 0;
+        return r;
+    }
+
+    // ---- Интерфейс --------------------------------------------------------
+    var input = document.getElementById('egn');
+    var statusEl = document.getElementById('status');
+    var output = document.getElementById('output');
+
+    function el(tag, cls, text) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text !== undefined) e.textContent = text;
+        return e;
+    }
+
+    function row(table, label, value) {
+        var tr = el('tr');
+        tr.appendChild(el('th', '', label));
+        tr.appendChild(el('td', '', value));
+        table.appendChild(tr);
+    }
+
+    function yearsWord(n) { return n === 1 ? 'година' : 'години'; }
+
+    function render() {
+        var egn = input.value.replace(/\D/g, '').slice(0, 10);
+        if (egn !== input.value) input.value = egn;
+        output.textContent = '';
+        input.classList.remove('valid', 'invalid');
+
+        if (egn.length < 10) {
+            statusEl.className = 'egn-status hint';
+            statusEl.textContent = egn.length === 0
+                ? 'Въведете ЕГН, за да го проверите.'
+                : 'Остават още ' + (10 - egn.length) + ' цифри.';
+            return;
+        }
+
+        var r = parseEgn(egn, new Date());
+        input.classList.add(r.valid ? 'valid' : 'invalid');
+        statusEl.className = 'egn-status ' + (r.valid ? 'valid' : 'invalid');
+        statusEl.textContent = r.valid ? '✔ Валидно ЕГН' : '✘ Невалидно ЕГН';
+
+        if (r.errors.length) {
+            var ul = el('ul', 'egn-errors');
+            r.errors.forEach(function (msg) { ul.appendChild(el('li', '', msg)); });
+            output.appendChild(ul);
+        }
+
+        // Разбивка на цифрите.
+        var digits = el('div', 'egn-digits');
+        for (var i = 0; i < 10; i++) {
+            var cls = i < 6 ? 'd-date' : i < 9 ? 'd-region' : 'd-check' + (r.checkOk ? '' : ' bad');
+            digits.appendChild(el('span', cls, egn[i]));
+        }
+        output.appendChild(digits);
+        var legend = el('div', 'egn-legend');
+        [['d-date', 'дата на раждане'], ['d-region', 'област, номер и пол'], ['d-check', 'контролна цифра']]
+            .forEach(function (item) {
+                var s = el('span');
+                s.appendChild(el('i', item[0]));
+                s.appendChild(document.createTextNode(item[1]));
+                legend.appendChild(s);
+            });
+        output.appendChild(legend);
+
+        var table = el('table', 'egn-details');
+        row(table, 'Пол', r.male ? 'Мъж' : 'Жена');
+        if (r.birth) {
+            row(table, 'Дата на раждане',
+                r.birth.getDate() + ' ' + MONTHS[r.birth.getMonth()] + ' ' + r.birth.getFullYear() +
+                ' г. (' + WEEKDAYS[r.birth.getDay()] + ')');
+        }
+        if (r.age !== undefined) row(table, 'Възраст', r.age + ' ' + yearsWord(r.age));
+        row(table, 'Област на раждане', r.region);
+        row(table, 'Пореден номер',
+            r.order + (r.male ? '-то момче' : '-то момиче') + ', родено на тази дата в областта');
+        output.appendChild(table);
+    }
+
+    input.addEventListener('input', render);
+    render();
+})();
+</script>
+</body>
+</html>
